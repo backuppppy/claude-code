@@ -1,0 +1,5 @@
+# ~/.config/audiobook-dl/audiobook-dl.toml — התחברות לסטוריטל
+# הערכים האמיתיים שמורים ב-GitHub Secrets: STORYTEL_USERNAME / STORYTEL_PASSWORD
+[sources.storytel]
+username = "XXXX@example.com"
+password = "XXXXXXXX"

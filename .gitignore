@@ -1,0 +1,29 @@
+# סודות — לעולם לא בריפו (שמורים ב-GitHub Secrets)
+.env
+*.env
+!*.env.example
+.gh_token
+.claude.json
+*.token
+*.keystore
+*.pem
+*.key
+
+# תלויות / build / cache
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.buildozer/
+bin/
+dist/
+build/
+
+# בינארים גדולים / תוצרים
+*.apk
+*.aab
+*.epub
+*.mp3
+*.tar.gz
+zeroclaw
