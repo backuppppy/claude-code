@@ -21,6 +21,19 @@ metadata:
 
 **⚠️ תקלה ופתרון — תווים אסורים בשם:** כשהכותרת מכילה תו אסור ב-FAT/אנדרואיד (למשל `?` — הכותרת הגיעה כ-"כראמל (10) הסוף?"), `-o "{title}"` נכשל עם `PermissionError: Operation not permitted`. הפתרון: לקבוע שם פלט מפורש ונקי, למשל `-o "Karamel_10_HaSof"`.
 
+**⚠️ באג ב-audiobook-dl — מוריד רק עטיפה, יוצא בלי שגיאה (2026-06-23):**
+בספר "הרומן שלי עם בן גוריון ועם פנינה" (1263712), audiobook-dl 0.7.3 הוריד רק `cover.jpg` ויצא עם **exit 0** בלי להוריד אודיו ובלי שגיאה (הלוג נעצר ב-"Downloading ... from storytel"). זו **לא** בעיית קליטה — אבחנּו שזרם ה-MP3 עצמו זמין לחלוטין (status 200, `audio/mpeg`, 166MB, מתחיל ב-`ID3`). הבאג ב-`get_files` של ה-extractor שלא מושך את הזרם בפועל.
+
+**הפתרון — הורדה ישירה מ-API של Storytel (עוקף את הכלי):**
+1. התחברות: `GET https://www.storytel.com/api/login.action?m=1&uid=<user>&pwd=<AES_hex>` → מחזיר `accountInfo.jwt` + `accountInfo.singleSignToken`. הצפנת הסיסמה: AES-CBC, key=`VQZBJ6TD8M9WBUWT`, iv=`joiwef08u23j341a`, PKCS7, hex.
+2. מדף: `GET https://www.storytel.com/api/getBookShelf.action?token=<singleSignToken>` (עם header `authorization: Bearer <jwt>`). **הספר חייב להיות במדף** אחרת `MissingBookAccess`.
+3. מציאת הספר: לולאה על `books[]`, התאמה `book["book"]["consumableId"] == <id מה-URL>` (החלק האחרון אחרי `-`). משם לוקחים `book["book"]["AId"]` (program id).
+4. אודיו: `GET https://www.storytel.com/mp3streamRangeReq?startposition=0&programId=<AId>&token=<singleSignToken>` → MP3 מלא (stream, iter_content).
+5. מטא-דאטה: מחבר=`book["authors"][].name`, מקריא=`abook["narrators"][].name`. עטיפה: `https://www.storytel.com/images/<abook.isbn>/640x640/cover.jpg`.
+6. תיוג: `ffmpeg -i raw.mp3 -i cover.jpg -map 0:a -map 1 -c copy -id3v2_version 3 -metadata title=.. -metadata artist=<author> -metadata composer=<narrator> out.mp3`.
+
+הסקריפט המלא שמור בגיטהאב: `scripts/storytel_direct_download.py` בריפו [[project-claude-code-backup]] (קורא קרדנציאלס מהקונפיג, ללא סודות בקוד). "הרומן שלי עם בן גוריון ועם פנינה" הורד כך (167MB, ~6h3m) והועבר ל-`/storage/emulated/0/Download/`.
+
 **טיפים לדיבוג:** ה-API `https://www.storytel.com/api/login.action` עובד ומחזיר JSON עם `loginStatusEnum` (PREMIUM / INVALID_CREDENTIALS). אפשר לבדוק התחברות ידנית מתוך ה-venv (`/root/.local/share/pipx/venvs/audiobook-dl/bin/python`) שיש בו pycryptodome. הסיסמה מוצפנת AES-CBC עם מפתחות קבועים בקוד.
 
-קשור ל-[[feedback_save_everything]].
+קשור ל-[[feedback_save_everything]], [[project-claude-code-backup]].

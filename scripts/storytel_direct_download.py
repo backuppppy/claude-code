@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+"""
+storytel_direct_download.py — הורדת ספר שמע מ-Storytel ישירות דרך ה-API.
+
+למה זה קיים:
+  audiobook-dl 0.7.3 נתקל בבאג שבו (לפחות לחלק מהספרים) הוא מוריד רק את העטיפה
+  ויוצא עם exit 0 *בלי* להוריד את האודיו ובלי שגיאה. אבחנּו שזרם ה-MP3 עצמו
+  זמin לחלוטין (HTTP 200, audio/mpeg, קובץ מלא) — ה-extractor פשוט לא מושך אותו.
+  הסקריפט הזה עוקף את הכלי ומדבר ישירות מול ה-API.
+
+דרישות מוקדמות:
+  - הספר חייב להיות ב-Bookshelf של החשבון (אחרת "MissingBookAccess").
+  - קרדנציאלס ב-~/.config/audiobook-dl/audiobook-dl.toml תחת [sources.storytel].
+  - ffmpeg ו-pycryptodome (Crypto) ו-requests מותקנים.
+
+שימוש:
+  python3 storytel_direct_download.py "<URL של הספר>" [שם_פלט]
+
+הצינור: login.action -> getBookShelf.action -> התאמת consumableId -> AId ->
+        mp3streamRangeReq -> הורדה -> הטמעת עטיפה+מטא-דאטה עם ffmpeg.
+"""
+import sys, os, subprocess, tomllib
+import requests
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad
+
+CONFIG = os.path.expanduser("~/.config/audiobook-dl/audiobook-dl.toml")
+# מפתחות הצפנה קבועים של Storytel (פומביים, מתוך storytel-tui / audiobook-dl)
+AES_KEY, AES_IV = b"VQZBJ6TD8M9WBUWT", b"joiwef08u23j341a"
+UA = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0"
+
+
+def encrypt_password(p: str) -> str:
+    return AES.new(AES_KEY, AES.MODE_CBC, AES_IV).encrypt(pad(p.encode(), 16)).hex()
+
+
+def book_id_from_url(url: str) -> str:
+    return url.rstrip("/").split("-")[-1]
+
+
+def main():
+    if len(sys.argv) < 2:
+        sys.exit("usage: storytel_direct_download.py <book_url> [output_name]")
+    url = sys.argv[1]
+    book_id = book_id_from_url(url)
+
+    cfg = tomllib.load(open(CONFIG, "rb"))["sources"]["storytel"]
+    s = requests.Session()
+    s.headers.update({"User-Agent": UA})
+
+    # 1) התחברות
+    ud = s.get("https://www.storytel.com/api/login.action",
+               params={"m": 1, "uid": cfg["username"],
+                       "pwd": encrypt_password(cfg["password"])}).json()
+    jwt = ud["accountInfo"]["jwt"]
+    token = ud["accountInfo"]["singleSignToken"]
+    s.headers.update({"authorization": f"Bearer {jwt}"})
+
+    # 2) מדף הספרים -> 3) מציאת הספר
+    shelf = s.get("https://www.storytel.com/api/getBookShelf.action",
+                  params={"token": token}).json()
+    book = next((b for b in shelf["books"]
+                 if b["book"]["consumableId"] == book_id), None)
+    if book is None:
+        sys.exit("הספר לא נמצא במדף — הוסף אותו ל-Bookshelf באפליקציה ונסה שוב.")
+
+    aid = book["book"]["AId"]
+    title = book["book"]["name"]
+    author = ", ".join(a["name"] for a in book["book"].get("authors", []))
+    narrator = ", ".join(n["name"] for n in book.get("abook", {}).get("narrators", []))
+    isbn = book.get("abook", {}).get("isbn")
+    out_name = sys.argv[2] if len(sys.argv) > 2 else title
+    print(f"📖 {title} | מחבר: {author} | מקריא: {narrator}")
+
+    # 4) הורדת זרם האודיו
+    raw = f"/tmp/{book_id}_raw.mp3"
+    stream = (f"https://www.storytel.com/mp3streamRangeReq?startposition=0"
+              f"&programId={aid}&token={token}")
+    with s.get(stream, stream=True) as r:
+        r.raise_for_status()
+        total = int(r.headers.get("content-length", 0))
+        done = 0
+        with open(raw, "wb") as f:
+            for ch in r.iter_content(1 << 20):
+                f.write(ch); done += len(ch)
+                if total and done % (20 << 20) < (1 << 20):
+                    print(f"  {done >> 20}/{total >> 20} MB")
+    print(f"  הורדה הושלמה: {done >> 20} MB")
+
+    # 5) עטיפה
+    cover = f"/tmp/{book_id}_cover.jpg"
+    if isbn:
+        with open(cover, "wb") as f:
+            f.write(s.get(f"https://www.storytel.com/images/{isbn}/640x640/cover.jpg").content)
+
+    # 6) תיוג + הטמעת עטיפה
+    out = f"{out_name}.mp3"
+    cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", raw]
+    if isbn and os.path.exists(cover):
+        cmd += ["-i", cover, "-map", "0:a", "-map", "1"]
+    else:
+        cmd += ["-map", "0:a"]
+    cmd += ["-c", "copy", "-id3v2_version", "3",
+            "-metadata", f"title={title}",
+            "-metadata", f"album={title}",
+            "-metadata", f"artist={author}",
+            "-metadata", f"composer={narrator}", out]
+    subprocess.run(cmd, check=True)
+    os.remove(raw)
+    if os.path.exists(cover):
+        os.remove(cover)
+    print(f"✅ נוצר: {out}")
+
+
+if __name__ == "__main__":
+    main()

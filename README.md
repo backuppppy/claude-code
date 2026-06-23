@@ -89,6 +89,7 @@ Proxy ל-OpenRouter. מפתח ב-`~/.config/godmod3.env` (ראו `config-templat
 ## כלים מותקנים בסביבה (לא קוד שלנו, רק לתיעוד)
 
 - **audiobook-dl** (0.7.3) + ffmpeg — הורדת ספרי שמע מ-**Storytel**. קונפיג: `config-templates/audiobook-dl.toml.example`. חשבון PREMIUM, מייל `9917099@gmail.com`. 📖 [`memory/project_audiobook_dl_storytel.md`](memory/project_audiobook_dl_storytel.md)
+  - ⚠️ **באג ידוע:** audiobook-dl 0.7.3 לפעמים מוריד רק את העטיפה ויוצא exit 0 בלי האודיו (לא בעיית קליטה — הזרם זמין). **פתרון:** `scripts/storytel_direct_download.py` — מוריד ישירות מ-API של Storytel (login → bookshelf → `mp3streamRangeReq`) ומטמיע עטיפה+מטא-דאטה. דרישה: הספר חייב להיות ב-Bookshelf. שימוש: `python3 scripts/storytel_direct_download.py "<URL>" [שם_פלט]`.
 - **Suno API** — `gcui-art/suno-api` (Cookie-based). 📖 [`memory/project_suno_api.md`](memory/project_suno_api.md)
 - **25 Skills** מותקנים מ-skills.sh (בסיס + חבילת סייבר/סריקה/תכנות). 📖 [`memory/project_skills_sh_install.md`](memory/project_skills_sh_install.md)
 - **subfinder** — קונפיג ספקים ב-`config-templates/subfinder-provider-config.yaml` (ריק, ללא מפתחות).

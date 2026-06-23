@@ -15,3 +15,4 @@
 - [QA Before Push](feedback_qa_before_push.md) — לבצע סקירת קוד ו-QA לפני כל push
 - [התקנת סקילים מ-skills.sh](project_skills_sh_install.md) — 25 סקילים מותקנים: בסיס + חבילת סייבר/סריקה/תכנות נבחרת
 - [audiobook-dl / סטוריטל](project_audiobook_dl_storytel.md) — הורדת ספרי שמע מסטוריטל עם jo1gi/audiobook-dl. מותקן 1.7.1 + ffmpeg, קונפיג עם פרטי התחברות מוכן
+- [גיבוי סביבת Claude Code](project_claude_code_backup.md) — כל הפרויקטים בריפו backuppppy/claude-code, סודות ב-GitHub Secrets, workflow לשחזור
