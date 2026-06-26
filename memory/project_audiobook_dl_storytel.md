@@ -15,6 +15,9 @@ metadata:
 - שימוש: `cd ~/Downloads && audiobook-dl --combine --cover "<URL>"`. דורש URL של ספר ספציפי.
 - אופציות שימושיות: `--combine` (קובץ mp3 אחד), `--cover`, `-o` (תבנית פלט), `-f` (פורמט), `--print-output` (בדיקה יבשה), `--debug`.
 
+**🔎 חיפוש ספרים בסטוריטל (נוסף 2026-06-26):** audiobook-dl עצמו לא תומך בחיפוש (דורש URL). אבל ל-Storytel יש **API חיפוש ציבורי שלא דורש התחברות**:
+`GET https://www.storytel.com/api/search.action?request_locale=he&q=<query>` → JSON עם `books[]`. לכל ספר: `book.name`, `book.authors[].name`, `book.consumableId` (ה-id להורדה), `abook.narrators[].name`, וקיום `abook`/`ebook` לפי פורמט. סקריפט מוכן: `scripts/storytel_search.py` בריפו [[project-claude-code-backup]] — `python3 storytel_search.py "<שם>" [--limit N] [--locale he]`. ה-`id` מהפלט מוזן ל-`storytel_direct_download.py`.
+
 **הורדות שבוצעו:**
 - "אדם רגיש מאוד" → הועבר ל-`/storage/emulated/0/Download/אדם רגיש מאוד.mp3` (306MB, 11h6m, 29 פרקים, עטיפה מוטמעת). הושלם 2026-06-22.
 - "כראמל (10) הסוף" → `/storage/emulated/0/Download/Karamel_10_HaSof.mp3` (131MB, ~4h47m, פרקים+עטיפה מוטמעים). הושלם 2026-06-22.
