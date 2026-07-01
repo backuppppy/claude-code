@@ -12,8 +12,9 @@
 - [הרשאות מקסימליות](feedback_permissions.md) — bypassPermissions פעיל, לא לשאול אישור על כלים
 - [בלי אוטומציה ברקע](feedback_no_background_automation.md) — המשתמש לא רוצה cron/scheduled jobs, גם אם חינמיים — מעדיף לבקש בדיקה ידנית
 - [Push Policy](feedback_github_push_policy.md) — לא לדחוף לגיטהאב בלי אישור מפורש — כל push מפעיל בנייה
-- [QA Before Push](feedback_qa_before_push.md) — לבצע סקירת קוד ו-QA לפני כל push
+- [QA Before Push](feedback_qa_before_push.md) — בוטל (2026-07-01): המשתמש ויתר על QA לפני push, לדחוף ישירות
 - [התקנת סקילים מ-skills.sh](project_skills_sh_install.md) — 25 סקילים מותקנים: בסיס + חבילת סייבר/סריקה/תכנות נבחרת
-- [audiobook-dl / סטוריטל](project_audiobook_dl_storytel.md) — הורדת ספרי שמע מסטוריטל עם jo1gi/audiobook-dl. מותקן 1.7.1 + ffmpeg, קונפיג עם פרטי התחברות מוכן
+- [audiobook-dl / סטוריטל](project_audiobook_dl_storytel.md) — הורדת ספרי שמע מסטוריטל עם jo1gi/audiobook-dl (v0.7.3) + ffmpeg. פאץ' שעוקף את דרישת המדף (getBookInfoForContent.action) — מוריד בלי להוסיף למדף
 - [גיבוי סביבת Claude Code](project_claude_code_backup.md) — כל הפרויקטים בריפו backuppppy/claude-code, סודות ב-GitHub Secrets, workflow לשחזור
+- [מסילת ישרים סדר ויכוח → EPUB](project_mesilat_yesharim_vikuach_epub.md) — בניית EPUB מגרסת הדיאלוג מתוך שכבת טקסט של PDF מהדורת אופק (חילוץ PyMuPDF, בלי OCR)
 - [free-for-dev](reference_free_for_dev.md) — רשימת שירותים/API-ים/כלים עם שכבה חינמית למפתחים (github.com/ripienaar/free-for-dev)
