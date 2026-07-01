@@ -9,14 +9,15 @@ storytel_direct_download.py — הורדת ספר שמע מ-Storytel ישירו�
   הסקריפט הזה עוקף את הכלי ומדבר ישירות מול ה-API.
 
 דרישות מוקדמות:
-  - הספר חייב להיות ב-Bookshelf של החשבון (אחרת "MissingBookAccess").
   - קרדנציאלס ב-~/.config/audiobook-dl/audiobook-dl.toml תחת [sources.storytel].
   - ffmpeg ו-pycryptodome (Crypto) ו-requests מותקנים.
+  - הספר *אינו* חייב להיות במדף — נעשה שימוש ב-getBookInfoForContent.action
+    שמחזיר את אותה רשומה גם לספרים שאינם במדף (owns=0).
 
 שימוש:
   python3 storytel_direct_download.py "<URL של הספר>" [שם_פלט]
 
-הצינור: login.action -> getBookShelf.action -> התאמת consumableId -> AId ->
+הצינור: login.action -> getBookInfoForContent.action (עוקף מדף) -> AId ->
         mp3streamRangeReq -> הורדה -> הטמעת עטיפה+מטא-דאטה עם ffmpeg.
 """
 import sys, os, subprocess, tomllib
@@ -56,13 +57,27 @@ def main():
     token = ud["accountInfo"]["singleSignToken"]
     s.headers.update({"authorization": f"Bearer {jwt}"})
 
-    # 2) מדף הספרים -> 3) מציאת הספר
-    shelf = s.get("https://www.storytel.com/api/getBookShelf.action",
-                  params={"token": token}).json()
-    book = next((b for b in shelf["books"]
-                 if b["book"]["consumableId"] == book_id), None)
+    # 2) מציאת הספר בלי מדף — getBookInfoForContent.action מחזיר רשומה בצורת מדף
+    #    (book/abook...) גם לספרים שאינם במדף. ה-id ב-URL יכול להיות bookId או
+    #    consumableId; אם consumableId — ממירים ל-bookId דרך book-details.
+    def get_slb(bid):
+        r = s.get("https://www.storytel.com/api/getBookInfoForContent.action",
+                  params={"bookId": bid, "token": token})
+        if r.status_code != 200:
+            return None
+        slb = r.json().get("slb")
+        if slb and (slb.get("book") or {}).get("AId") is not None:
+            return slb
+        return None
+
+    book = get_slb(book_id)
     if book is None:
-        sys.exit("הספר לא נמצא במדף — הוסף אותו ל-Bookshelf באפליקציה ונסה שוב.")
+        r = s.get(f"https://api.storytel.net/book-details/consumables/{book_id}")
+        legacy_id = r.json().get("bookId") if r.status_code == 200 else None
+        if legacy_id is not None:
+            book = get_slb(legacy_id)
+    if book is None:
+        sys.exit("לא נמצאה רשומת ספר עבור ה-id (בדוק את ה-URL / החשבון).")
 
     aid = book["book"]["AId"]
     title = book["book"]["name"]
