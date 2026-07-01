@@ -87,20 +87,46 @@ def main():
     out_name = sys.argv[2] if len(sys.argv) > 2 else title
     print(f"📖 {title} | מחבר: {author} | מקריא: {narrator}")
 
-    # 4) הורדת זרם האודיו
+    # 4) הורדת זרם האודיו — הורדה מתחדשת עם אימות גודל.
+    #    ⚠️ הזרם עלול להיקטע באמצע. אסור לתייג קובץ חלקי (טעינו פעם ומסרנו 1h46m
+    #    במקום 11.5h). לכן: קוראים את הגודל המלא מ-content-range, ומורידים עם
+    #    Range מתחדש (bytes=<כמה שכבר יש>-) עד שגודל הקובץ תואם בדיוק.
     raw = f"/tmp/{book_id}_raw.mp3"
     stream = (f"https://www.storytel.com/mp3streamRangeReq?startposition=0"
               f"&programId={aid}&token={token}")
-    with s.get(stream, stream=True) as r:
-        r.raise_for_status()
-        total = int(r.headers.get("content-length", 0))
-        done = 0
-        with open(raw, "wb") as f:
-            for ch in r.iter_content(1 << 20):
-                f.write(ch); done += len(ch)
-                if total and done % (20 << 20) < (1 << 20):
-                    print(f"  {done >> 20}/{total >> 20} MB")
-    print(f"  הורדה הושלמה: {done >> 20} MB")
+    if os.path.exists(raw):
+        os.remove(raw)
+    head = s.get(stream, headers={"Range": "bytes=0-0"}, stream=True)
+    total = int(head.headers["content-range"].split("/")[-1])
+    head.close()
+    print(f"  גודל צפוי: {total >> 20} MB")
+    stalls = 0
+    while True:
+        have = os.path.getsize(raw) if os.path.exists(raw) else 0
+        if have >= total:
+            break
+        try:
+            r = s.get(stream, headers={"Range": f"bytes={have}-"},
+                      stream=True, timeout=60)
+            if r.status_code not in (200, 206):
+                r.close(); stalls += 1
+            else:
+                with open(raw, "ab" if have else "wb") as f:
+                    for ch in r.iter_content(1 << 20):
+                        if ch:
+                            f.write(ch)
+                r.close()
+        except requests.RequestException as e:
+            print(f"  שגיאת רשת, ממשיך מ-{have >> 20}MB: {e}")
+        now = os.path.getsize(raw) if os.path.exists(raw) else 0
+        print(f"  {now >> 20}/{total >> 20} MB")
+        stalls = stalls + 1 if now == have else 0
+        if stalls >= 10:
+            sys.exit(f"ההורדה נתקעה ב-{now}/{total} bytes — נסה שוב.")
+    final = os.path.getsize(raw)
+    if final != total:
+        sys.exit(f"אי-התאמת גודל: {final} != {total} — הקובץ חלקי, לא מתייג.")
+    print(f"  הורדה הושלמה ואומתה: {final >> 20} MB")
 
     # 5) עטיפה
     cover = f"/tmp/{book_id}_cover.jpg"
