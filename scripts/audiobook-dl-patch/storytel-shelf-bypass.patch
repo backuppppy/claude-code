@@ -1,0 +1,66 @@
+--- a/storytel.py
++++ b/storytel.py
+@@ -60,8 +60,7 @@
+ 
+     def download(self, url: str) -> Audiobook:
+         book_id = self.get_book_id(url)
+-        bookshelf = self.download_bookshelf()
+-        book_info = self.find_book_info(bookshelf, book_id)
++        book_info = self.get_book_info(book_id)
+         return Audiobook(
+             session = self._session,
+             files = self.get_files(book_info),
+@@ -83,6 +82,53 @@
+             raise DataNotPresent
+         return parsed.path.split("-")[-1]
+ 
++    def get_book_info(self, book_id: str):
++        """
++        Fetch the full book record directly, WITHOUT requiring the book to be
++        on the user's bookshelf. The returned structure matches a bookshelf
++        entry (``book`` + ``abook`` etc.), so the rest of the source is unchanged.
++
++        The id in a Storytel url can be either the legacy bookId or the
++        consumableId; both are handled.
++
++        :param book_id: Id taken from the book url
++        :returns: Book information (bookshelf-entry shape)
++        """
++        slb = self._get_slb(book_id)
++        if slb is None:
++            # book_id was probably a consumableId -> resolve to legacy bookId
++            legacy_id = self._consumable_to_bookid(book_id)
++            if legacy_id is not None:
++                slb = self._get_slb(legacy_id)
++        if slb is None:
++            raise MissingBookAccess
++        return slb
++
++    def _get_slb(self, book_id):
++        """Return the bookshelf-shaped record for a legacy bookId, or None."""
++        resp = self._session.get(
++            "https://www.storytel.com/api/getBookInfoForContent.action",
++            params = {
++                "bookId": book_id,
++                "token": self.single_signon_token,
++            }
++        )
++        if resp.status_code != 200:
++            return None
++        slb = resp.json().get("slb")
++        if slb and (slb.get("book") or {}).get("AId") is not None:
++            return slb
++        return None
++
++    def _consumable_to_bookid(self, consumable_id):
++        """Map a consumableId to its legacy bookId, or None."""
++        resp = self._session.get(
++            f"https://api.storytel.net/book-details/consumables/{consumable_id}"
++        )
++        if resp.status_code != 200:
++            return None
++        return resp.json().get("bookId")
++
+     def download_bookshelf(self):
+         """Download bookshelf data"""
+         return self._session.get(
