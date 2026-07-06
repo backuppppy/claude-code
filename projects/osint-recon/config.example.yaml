@@ -1,0 +1,11 @@
+# Optional API keys — copy to config.yaml to enable premium sources.
+# Everything works WITHOUT keys using free endpoints (crt.sh, Shodan InternetDB,
+# Wayback, GreyNoise community, DuckDuckGo, hackertarget). Keys just add depth.
+shodan:       ""   # https://account.shodan.io  (full host data)
+hunter:       ""   # https://hunter.io           (emails by domain)
+hibp:         ""   # https://haveibeenpwned.com/API/Key (breaches)
+intelx:       ""   # https://intelx.io           (leaks / darknet / paste)
+censys_id:    ""   # https://censys.io
+censys_secret: ""
+greynoise:    ""   # https://greynoise.io        (raises rate limits)
+virustotal:   ""   # https://virustotal.com

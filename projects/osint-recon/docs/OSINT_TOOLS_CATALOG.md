@@ -31,6 +31,8 @@
 | TheBigBrother | https://github.com/chadi0x/TheBigBrother | פריימוורק recon כולל |
 | FoxyRecon | https://github.com/vincenzocaputo/FoxyRecon | תוסף דפדפן ל-recon |
 | WorldMonitor | https://worldmonitor.app · https://github.com/koala73/worldmonitor | ניטור אירועים עולמי בזמן אמת |
+| OSINT-BIBLE | https://github.com/frangelbarrera/OSINT-BIBLE | מתודולוגיה + "תנ"ך" טכניקות OSINT (משוכפל מקומית ב-`references/OSINT-BIBLE`) |
+| OSINT-Books | https://github.com/ubikron/OSINT-Books | אוסף ספרי/מדריכי OSINT להעמקה |
 
 ---
 

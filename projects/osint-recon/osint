@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Launcher — runs recon.py inside the project venv with all CLI tools on PATH.
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
+PY="$DIR/.venv/bin/python"
+[ -x "$PY" ] || PY="python3"
+exec "$PY" "$DIR/recon.py" "$@"
