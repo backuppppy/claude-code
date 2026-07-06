@@ -44,6 +44,7 @@ claude-code/
 - ריפו ייעודי קיים: `backuppppy/tg-backup-apk` (public). כאן שמור עותק המקור.
 - Sentry: ארגון `bubababa`, פרויקט `python-5n` (python-flask). ה-DSN ציבורי-בעצם-טבעו ולכן נשאר ב-`server.py`.
 - 📖 פרטים מלאים: [`memory/project_tg_backup_apk.md`](memory/project_tg_backup_apk.md)
+- 💡 חלופה מוכנה ל-self-host (Go): [SaveAny-Bot](https://github.com/krau/SaveAny-Bot) — בוט טלגרם לגיבוי כל קובץ ליעדי אחסון שונים. (ראו [#1](https://github.com/backuppppy/claude-code/issues/1))
 
 ### 2. WhatsApp Groups Counter — `projects/wa-counter/`
 ניסיון לספור קבוצות וואטסאפ דרך סקריפט. **לא הושלם** — נחסם על שלב ה-QR.
