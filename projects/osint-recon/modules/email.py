@@ -3,6 +3,7 @@ from __future__ import annotations
 import json, tempfile, os
 from pathlib import Path
 from .utils import run_cmd, have, ddg, http_json, info, warn
+from . import apis
 
 
 def _holehe(email):
@@ -38,6 +39,9 @@ def run(target, ttype, report):
 
     report.add("✅ Accounts using this email (holehe)", _holehe(target))
     report.add("📱 Platform registration (socialscan)", _socialscan(target))
+    report.add("🧑 Gravatar profile", apis.gravatar(target))
+    report.add("📊 Reputation / exposure (EmailRep 🔑)", apis.emailrep(target))
+    report.add("⚠️ Breaches (HIBP 🔑)", apis.hibp(target))
 
     user = target.split("@")[0]
     dorks = []

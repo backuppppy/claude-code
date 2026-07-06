@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from .utils import (run_cmd, http_json, http_text, ddg, have,
                     info, warn, good)
+from . import apis
 
 
 def _crtsh(domain):
@@ -143,6 +144,12 @@ def run(target, ttype, report):
         report.add("🖧 Hosts (theHarvester)", sorted(set(hosts)))
 
     report.add("🎭 Typosquat / lookalike domains", results.get("dnstwist") or [])
+
+    # API enrichment (free RDAP/URLhaus always; Hunter/VT only with keys)
+    report.add("📜 Registration (RDAP)", apis.rdap_domain(target))
+    report.add("🦠 Malware URLs (URLhaus 🔑)", apis.urlhaus_host(target))
+    report.add("📧 Emails (Hunter.io 🔑)", apis.hunter_domain(target))
+    report.add("🛡️ Reputation (VirusTotal 🔑)", apis.virustotal("domains", target))
 
     # quick login / sensitive dorks
     dorks = []

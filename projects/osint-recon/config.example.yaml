@@ -8,4 +8,6 @@ intelx:       ""   # https://intelx.io           (leaks / darknet / paste)
 censys_id:    ""   # https://censys.io
 censys_secret: ""
 greynoise:    ""   # https://greynoise.io        (raises rate limits)
-virustotal:   ""   # https://virustotal.com
+virustotal:   ""   # https://virustotal.com      (domain/IP reputation)
+emailrep:     ""   # https://emailrep.io         (email reputation; free key)
+abusech:      ""   # https://auth.abuse.ch       (URLhaus malware URLs; free Auth-Key)

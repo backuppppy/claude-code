@@ -173,11 +173,20 @@
 ---
 
 ## Free-tier / No-key endpoints שמנוצלים אוטומטית ב-recon.py
-- **crt.sh** — `https://crt.sh/?q=%25.DOMAIN&output=json`
-- **Shodan InternetDB** — `https://internetdb.shodan.io/IP` (חינמי, ללא מפתח)
-- **Wayback CDX** — `http://web.archive.org/cdx/search/cdx?url=DOMAIN/*&output=json`
-- **HackerTarget** — `https://api.hackertarget.com/...` (שכבה חינמית מוגבלת)
-- **DuckDuckGo** — דרך `ddgs` (דורקים)
+מקורות שנבחרו גם מתוך **[public-apis](https://github.com/public-apis/public-apis)** (קטגוריות Security / Open Data):
+- **crt.sh** — `https://crt.sh/?q=%25.DOMAIN&output=json` (סאבדומיינים)
+- **Shodan InternetDB** — `https://internetdb.shodan.io/IP` (פורטים/חולשות, ללא מפתח)
+- **RDAP** — `https://rdap.org/domain/DOMAIN` · `/ip/IP` (רישום/registrar/netblock, ללא מפתח)
+- **Wayback** — CDX + availability API (`archive.org/wayback/available`)
+- **HackerTarget** — `https://api.hackertarget.com/hostsearch/?q=DOMAIN`
 - **GreyNoise Community** — `https://api.greynoise.io/v3/community/IP`
+- **Gravatar** — `https://www.gravatar.com/HASH.json` (פרופיל לפי אימייל)
+- **GitHub API** — `https://api.github.com/users/USER` (פרופיל ציבורי)
+- **ip-api** — `http://ip-api.com/json/IP` (geo/ASN)
+- **DuckDuckGo** — דרך `ddgs` (כל הדורקים)
 
-> API keys אופציונליים מוגדרים ב-`config.yaml` (ראה `config.example.yaml`).
+## מקורות מבוססי-מפתח (🔑, אופציונלי ב-`config.yaml`)
+Shodan (host מלא) · Hunter.io (אימיילים) · VirusTotal (מוניטין domain/IP) · HIBP (דליפות) ·
+EmailRep (מוניטין אימייל) · abuse.ch URLhaus (URLs זדוניים) · GreyNoise · IntelX · Censys.
+> כל אלה **מושבתים בשקט** ללא מפתח — הכלי עובד מלא רק עם המקורות החינמיים.
+> הערה: EmailRep ו-abuse.ch/URLhaus הפכו לאחרונה לדרוש מפתח (בעבר היו חינמיים ללא auth).

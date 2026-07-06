@@ -107,6 +107,29 @@ def now_stamp():
     return datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+# ------- optional config (API keys) -------
+_CONFIG = None
+def load_config():
+    """Read config.yaml (optional). Everything works without it."""
+    global _CONFIG
+    if _CONFIG is not None:
+        return _CONFIG
+    _CONFIG = {}
+    try:
+        import yaml
+        p = Path(__file__).resolve().parent.parent / "config.yaml"
+        if p.exists():
+            _CONFIG = yaml.safe_load(p.read_text()) or {}
+    except Exception:
+        _CONFIG = {}
+    return _CONFIG
+
+
+def api_key(name):
+    v = load_config().get(name)
+    return str(v).strip() if v else ""
+
+
 class Report:
     """Collects findings and renders Markdown + JSON."""
     def __init__(self, target, ttype, outdir: Path):

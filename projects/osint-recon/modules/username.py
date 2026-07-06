@@ -3,6 +3,7 @@ from __future__ import annotations
 import json, tempfile, os, re
 from pathlib import Path
 from .utils import run_cmd, have, ddg, info, warn
+from . import apis
 
 
 def _sherlock(username):
@@ -73,6 +74,8 @@ def run(target, ttype, report):
 
     ss = _socialscan(target)
     report.add("📱 Platform availability (socialscan)", ss)
+
+    report.add("🐙 GitHub profile", apis.github_user(target))
 
     dorks = []
     for q in (f'"{target}" (site:twitter.com OR site:x.com OR site:instagram.com OR site:facebook.com OR site:linkedin.com)',

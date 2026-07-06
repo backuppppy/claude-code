@@ -2,6 +2,7 @@
 from __future__ import annotations
 import socket
 from .utils import http_json, http_text, run_cmd, have, info
+from . import apis
 
 
 def _internetdb(ip):
@@ -60,7 +61,11 @@ def _whois(ip):
 def run(target, ttype, report):
     info("=== IP RECON ===")
     report.add("🛰️ Open ports & vulns (Shodan InternetDB)", _internetdb(target))
+    report.add("🔦 Shodan full host (🔑)", apis.shodan_host(target))
     report.add("🌍 Geolocation / ASN", _geo(target))
     report.add("↩️ Reverse DNS", _rdns(target))
     report.add("🚦 GreyNoise (scanner classification)", _greynoise(target))
+    report.add("📜 Netblock (RDAP)", apis.rdap_ip(target))
+    report.add("🦠 Malware URLs (URLhaus 🔑)", apis.urlhaus_host(target))
+    report.add("🛡️ Reputation (VirusTotal 🔑)", apis.virustotal("ip_addresses", target))
     report.add("📇 WHOIS / netblock", _whois(target))

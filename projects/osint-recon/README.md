@@ -30,11 +30,11 @@ cd projects/osint-recon
 ## מה זה מריץ לפי סוג
 | סוג | מקורות |
 |---|---|
-| **domain** | crt.sh · subfinder · amass · hackertarget · theHarvester · DNS · dnstwist · דורקים |
-| **username** | Sherlock · Maigret · socialscan · דורקים סושיאל |
-| **email** | holehe · socialscan · דורקים · לינקים ל-HIBP/IntelX |
+| **domain** | crt.sh · subfinder · amass · hackertarget · theHarvester · DNS · dnstwist · **RDAP** · Hunter🔑 · VirusTotal🔑 · דורקים |
+| **username** | Sherlock · Maigret · socialscan · **GitHub API** · דורקים סושיאל |
+| **email** | holehe · socialscan · **Gravatar** · EmailRep🔑 · HIBP🔑 · דורקים |
 | **phone** | וריאציות פורמט · דורקים · Truecaller/OSINT.industries |
-| **ip** | Shodan InternetDB (חינם) · GreyNoise · geo/ASN · reverse DNS · WHOIS |
+| **ip** | Shodan InternetDB (חינם) · Shodan🔑 · **RDAP** · GreyNoise · geo/ASN · reverse DNS · VirusTotal🔑 · WHOIS |
 | **person** | פרופילים סושיאל/מקצועי · חדשות · חיפוש תמונה |
 | **כל סוג** | 📄 **חיפוש קבצים עמוק**: דורקי filetype, ספריות פתוחות, Wayback, grep.app |
 
