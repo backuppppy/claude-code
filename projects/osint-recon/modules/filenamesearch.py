@@ -9,6 +9,36 @@ from __future__ import annotations
 import re, urllib.parse
 from .utils import ddg, http_text, http_json, info, good
 
+# document / file-sharing / ebook hosts to sweep with site: dorks
+FILE_SITES = [
+    "scribd.com", "slideshare.net", "vdoc.pub", "pdfcoffee.com", "dokumen.pub",
+    "fliphtml5.com", "yumpu.com", "calameo.com", "issuu.com", "academia.edu",
+    "anyflip.com", "docero.com", "pdfdrive.com", "oceanofpdf.com", "z-lib.io",
+    "annas-archive.org", "libgen.is", "4shared.com", "mediafire.com", "mega.nz",
+    "dropbox.com", "drive.google.com", "docs.google.com", "box.com",
+    "wetransfer.com", "anonfiles.com", "t.me", "archive.org", "readanybook.com",
+]
+
+
+def _agg_links(name):
+    """Direct SEARCH links on major ebook / document aggregators (always useful)."""
+    q = urllib.parse.quote(name)
+    return [
+        f"[Anna's Archive](https://annas-archive.org/search?q={q})",
+        f"[Library Genesis](https://libgen.is/search.php?req={q})",
+        f"[Open Library](https://openlibrary.org/search?q={q})",
+        f"[Google Books](https://www.google.com/search?tbm=bks&q={q})",
+        f"[Z-Library](https://z-lib.io/s/{q})",
+        f"[PDF Drive](https://www.pdfdrive.com/search?q={q})",
+        f"[Scribd search](https://www.scribd.com/search?query={q})",
+        f"[Internet Archive](https://archive.org/search?query={q})",
+        f"[WorldCat](https://search.worldcat.org/search?q={q})",
+    ]
+
+
+def _or_sites(sites):
+    return "(" + " OR ".join(f"site:{s}" for s in sites) + ")"
+
 
 def _dork(query, cap=15):
     out = []
@@ -72,9 +102,21 @@ def run(name, ext, report):
     # layer 4 — broad exact filename (forums, repos, cloud shares)
     collect("Exact filename (broad)", [
         f'"{name}.{ext}"',
-        f'"{name}.{ext}" (site:drive.google.com OR site:dropbox.com OR '
-        f'site:mega.nz OR site:mediafire.com OR site:scribd.com)',
+        f'"{name}" ({ext} OR download OR télécharger OR "free pdf" OR ebook)',
     ])
+
+    # layer 4b — sweep document / file-sharing / ebook hosts (split to avoid long query)
+    half = len(FILE_SITES) // 2
+    collect("Document & file-sharing sites", [
+        f'"{name}" {_or_sites(FILE_SITES[:half])}',
+        f'"{name}" {_or_sites(FILE_SITES[half:])}',
+    ])
+
+    # layer 4c — ebook aggregators direct search links (deterministic)
+    info(">>> Ebook / document aggregators")
+    aggs = _agg_links(name)
+    report.add("📚 Ebook / document aggregators (search)", aggs)
+    all_hits.extend(aggs)
 
     # layer 5 — Wayback archived copy of the actual file URLs found above
     info(">>> Wayback Machine (archived copies of found files)")
