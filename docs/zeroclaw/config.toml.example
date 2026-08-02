@@ -1,0 +1,58 @@
+schema_version = 3
+
+[agents.agggeeeenttt]
+risk_profile = "open"
+runtime_profile = "unbounded"
+model_provider = "anthropic.default"
+max_tool_iterations = 15
+step_timeout_secs = 300
+skill_bundles = ["default"]
+
+[skill_bundles.default]
+
+[memory]
+backend = "sqlite.sqlite"
+
+[runtime_profiles.unbounded]
+agentic = true
+agentic_timeout_secs = 1800
+compact_context = false
+delegation_timeout_secs = 900
+keep_tool_context_turns = 8
+max_tool_iterations = 100
+
+[risk_profiles.open]
+require_approval_for_medium_risk = false
+require_approval_for_high_risk = false
+sandbox_enabled = false
+workspace_only = false
+allowed_commands = ["*"]
+allowed_paths = ["/"]
+forbidden_paths = []
+path_restrictions_enabled = false
+restrict_file_access = false
+block_high_risk_commands = false
+
+[risk_profiles.open.delegation_policy]
+mode = "allow"
+
+[onboard_state]
+quickstart_completed = true
+
+[providers.models.anthropic.default]
+model = "claude-opus-5"
+api_key = "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"
+timeout_secs = 300
+
+[http_request]
+allowed_domains = ["*"]
+allow_local_hosts = true
+timeout_secs = 60
+max_response_size_mb = 50
+
+[browser]
+allowed_domains = ["*"]
+allow_local_hosts = true
+timeout_secs = 30
+
+[skill_bundles]
