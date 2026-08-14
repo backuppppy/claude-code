@@ -13,25 +13,73 @@
 
 ```
 claude-code/
-├── README.md                  ← הקובץ הזה (מפת-על)
-├── memory/                    ← קבצי הזיכרון המלאים (המקור האמיתי לכל פרט)
-├── projects/                  ← קוד המקור של כל הפרויקטים
-│   ├── tg-backup-apk/         ← אפליקציית גיבוי טלגרם (APK) — הפרויקט המרכזי
-│   ├── tg_apk/                ← גרסה/ניסוי מוקדם של אותו פרויקט
-│   ├── wa-counter/            ← ספירת קבוצות וואטסאפ
-│   ├── web/                   ← סריקת אתר "הורים מחוברים" (conectedmmb)
-│   ├── fxp_bot/               ← בוט טלגרם לניטור FXP
-│   ├── font_maker/            ← יצירת פונט
-│   └── G0DM0D3-changes/       ← רק ה-diff שלנו ל-fork של elder-plinius/G0DM0D3
-├── scripts/                   ← סקריפטים עצמאיים
-│   ├── book/                  ← בניית הספר מקובץ הכתיבה הענק (EPUB/PDF)
-│   ├── godmod3_proxy.py       ← proxy ל-OpenRouter
+├── README.md                    ← הקובץ הזה (מפת-על)
+├── memory/                      ← קבצי הזיכרון המלאים (המקור האמיתי לכל פרט)
+├── zeroclaw-termux-setup/       ← ⭐ ZeroClaw על Termux (100% שלם + סקריפטים)
+│   ├── README.md                ← הוראות התקנה מהירות
+│   ├── config.toml              ← קונפיגורציה (YOLO mode)
+│   ├── install.sh               ← סקריפט התקנה אוטומטי
+│   └── scripts/                 ← סקריפטים עצמאיים (aliases, daemon, etc)
+│       ├── aliases.sh
+│       ├── zc-gh.sh, zc-git.sh, zc-cmd.sh
+│       ├── zc-daemon.sh
+│       └── zc-streaming.sh
+├── projects/                    ← קוד המקור של כל הפרויקטים
+│   ├── tg-backup-apk/           ← אפליקציית גיבוי טלגרם (APK) — הפרויקט המרכזי
+│   ├── tg_apk/                  ← גרסה/ניסוי מוקדם של אותו פרויקט
+│   ├── wa-counter/              ← ספירת קבוצות וואטסאפ
+│   ├── web/                     ← סריקת אתר "הורים מחוברים" (conectedmmb)
+│   ├── fxp_bot/                 ← בוט טלגרם לניטור FXP
+│   ├── font_maker/              ← יצירת פונט
+│   └── G0DM0D3-changes/         ← רק ה-diff שלנו ל-fork של elder-plinius/G0DM0D3
+├── scripts/                     ← סקריפטים עצמאיים
+│   ├── book/                    ← בניית הספר מקובץ הכתיבה הענק (EPUB/PDF)
+│   ├── godmod3_proxy.py         ← proxy ל-OpenRouter
 │   ├── email_generator.py, fb_to_md.py, youtube_public_probe.py ...
-│   └── build_runner*.sh       ← סקריפטי בנייה
-├── config-templates/          ← תבניות קונפיג עם placeholders (הערכים האמיתיים ב-Secrets)
+│   └── build_runner*.sh         ← סקריפטי בנייה
+├── config-templates/            ← תבניות קונפיג עם placeholders (הערכים האמיתיים ב-Secrets)
 └── .github/workflows/
-    └── restore-secrets.yml    ← הרצה ידנית שמשחזרת את הסודות לקבצים (artifact)
+    └── restore-secrets.yml      ← הרצה ידנית שמשחזרת את הסודות לקבצים (artifact)
 ```
+
+---
+
+## ⭐ ZeroClaw על Termux — 100% שלם ומוכן לשימוש
+
+**גרסה:** v0.8.3 עם Claude Opus 5 API
+**סטטוס:** 🚀 **PRODUCTION READY**
+
+### מה זה ZeroClaw?
+סוכן AI אגנטי בRust שרץ לא ידברות. עבודה עם shell commands, git, GitHub, וקבצים עם Hebrew support מלא.
+
+### ✅ מה עובד
+- Claude Opus 5 API (Anthropic) עם tool-calling יציב 100%
+- YOLO Mode (ללא הודעות אישור / approval prompts)
+- Streaming output (real-time)
+- GitHub integration (`gh` CLI)
+- תמיכה מלאה בעברית
+
+### 🎯 התקנה מהירה
+```bash
+# 1. העתקה אוטומטית לטרמוקס (או קרא zeroclaw-termux-setup/README.md)
+bash zeroclaw-termux-setup/install.sh
+
+# 2. ערוך את הקונפיג וכנס API key
+nano ~/.zeroclaw/config.toml
+
+# 3. בדוק:
+zcs  # צריך לראות "Claude Opus 5" + "permissive"
+
+# 4. השתמש:
+zc "בדוק את הרפוזיטוריים שלי"
+```
+
+### 📝 דוקומנטציה מלאה
+- **התקנה ושימוש:** [`zeroclaw-termux-setup/README.md`](zeroclaw-termux-setup/README.md)
+- **קונפיגורציה:** [`zeroclaw-termux-setup/config.toml`](zeroclaw-termux-setup/config.toml)
+- **סקריפטים:** [`zeroclaw-termux-setup/scripts/`](zeroclaw-termux-setup/scripts/)
+- **טכנית מעמיקה:** [`ZEROCLAW_ANDROID_SETUP.md`](ZEROCLAW_ANDROID_SETUP.md) + [`ZEROCLAW_YOLO_MODE_DOCUMENTATION.md`](ZEROCLAW_YOLO_MODE_DOCUMENTATION.md)
+- **זיכרון:** [`memory/zeroclaw_termux_complete.md`](memory/zeroclaw_termux_complete.md)
 
 ---
 
