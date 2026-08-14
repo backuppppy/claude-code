@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  stips-monitor:
+    build: .
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - POLLING_INTERVAL=${POLLING_INTERVAL:-300}
+      - DATABASE_PATH=/data/stips_monitor.db
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
