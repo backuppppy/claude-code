@@ -34,6 +34,11 @@ claude-code/
 │   └── G0DM0D3-changes/         ← רק ה-diff שלנו ל-fork של elder-plinius/G0DM0D3
 ├── scripts/                     ← סקריפטים עצמאיים
 │   ├── book/                    ← בניית הספר מקובץ הכתיבה הענק (EPUB/PDF)
+│   ├── audiobook-dl/            ← ⭐ Storytel scraping (storytel.py, storytel_direct_download.py)
+│   ├── spec-kit/                ← ⭐ GitHub spec-kit utilities
+│   │   ├── bash/                ← check-prerequisites.sh, create-new-feature.sh, etc
+│   │   └── python/              ← check_prerequisites.py, create_new_feature.py, etc
+│   ├── projects/                ← Utility scripts for projects
 │   ├── godmod3_proxy.py         ← proxy ל-OpenRouter
 │   ├── email_generator.py, fb_to_md.py, youtube_public_probe.py ...
 │   └── build_runner*.sh         ← סקריפטי בנייה
@@ -80,6 +85,84 @@ zc "בדוק את הרפוזיטוריים שלי"
 - **סקריפטים:** [`zeroclaw-termux-setup/scripts/`](zeroclaw-termux-setup/scripts/)
 - **טכנית מעמיקה:** [`ZEROCLAW_ANDROID_SETUP.md`](ZEROCLAW_ANDROID_SETUP.md) + [`ZEROCLAW_YOLO_MODE_DOCUMENTATION.md`](ZEROCLAW_YOLO_MODE_DOCUMENTATION.md)
 - **זיכרון:** [`memory/zeroclaw_termux_complete.md`](memory/zeroclaw_termux_complete.md)
+
+---
+
+## 🛠️ Spec-Kit Scripts — GitHub Utilities
+
+**מקור:** https://github.com/github/spec-kit
+
+GitHub's spec-kit toolkit עבור feature management, prerequisites checking, ו-task orchestration.
+
+### 📂 `scripts/spec-kit/`
+- **bash/** — Shell utilities (6 scripts):
+  - `check-prerequisites.sh` — Verify environment requirements
+  - `common.sh` — Shared bash utilities
+  - `create-new-feature.sh` — Feature scaffolding
+  - `resolve-template.sh`, `setup-plan.sh`, `setup-tasks.sh`
+
+- **python/** — Python equivalents (6 scripts):
+  - `check_prerequisites.py` — Environment verification
+  - `common.py` — Shared utilities
+  - `create_new_feature.py` — Feature scaffolding
+  - `resolve_template.py`, `setup_plan.py`, `setup_tasks.py`
+
+### 💡 שימוש
+```bash
+# Check system prerequisites
+bash scripts/spec-kit/bash/check-prerequisites.sh
+
+# Create new feature
+bash scripts/spec-kit/bash/create-new-feature.sh "feature-name"
+```
+
+---
+
+## 🎵 Storytel Scripts — Audiobook Scraping
+
+**קבצים:** `scripts/audiobook-dl/`
+
+Scripts להורדה וסריקת ספרי שמע מ-Storytel Premium.
+
+### 📂 סקריפטים
+- `storytel.py` — Main Storytel API client
+- `storytel_direct_download.py` — Download audiobooks directly from Storytel API
+- `storytel_search.py` — Search Storytel catalog
+
+### דרישות
+```bash
+pip install -r projects/stips-monitor/requirements.txt
+```
+
+---
+
+## 📊 STIPS Monitor — Monitoring Project
+
+**קבצים:** `projects/stips-monitor/`
+
+Telegram Bot Monitoring System עם database, notifications, and status tracking.
+
+### 📂 מבנה
+```
+stips-monitor/
+├── main.py              ← Entry point
+├── database.py          ← SQLite wrapper
+├── monitor.py           ← Monitoring logic
+├── notifier.py          ← Telegram notifications
+├── config.py            ← Configuration
+├── requirements.txt     ← Python dependencies
+├── .env.example         ← Environment template
+└── README.md            ← Full documentation
+```
+
+### 🚀 התקנה
+```bash
+cd projects/stips-monitor
+pip install -r requirements.txt
+cp .env.example .env
+nano .env  # Add Telegram bot token & chat ID
+python main.py
+```
 
 ---
 
