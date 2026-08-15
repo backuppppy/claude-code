@@ -38,8 +38,7 @@ env/
 *.swo
 *~
 
-# Database
-*.db
+# Database (except our app database)
 *.sqlite
 *.sqlite3
 

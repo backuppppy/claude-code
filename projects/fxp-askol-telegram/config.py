@@ -19,8 +19,8 @@ if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
     raise ValueError("TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set in .env")
 
 # FXP Configuration
-FXP_BASE_URL = 'https://www.fxp.co.il'
-FXP_QUESTIONS_URL = f'{FXP_BASE_URL}/forum'
+FXP_BASE_URL = 'https://www.fxp.co.il/forumdisplay.php'
+FXP_QUESTIONS_URL = f'{FXP_BASE_URL}?f=1'  # Askol section
 FXP_MONITOR_INTERVAL = int(os.getenv('FXP_MONITOR_INTERVAL', 300))  # 5 minutes
 FXP_SCRAPER_TIMEOUT = int(os.getenv('FXP_SCRAPER_TIMEOUT', 30))
 
