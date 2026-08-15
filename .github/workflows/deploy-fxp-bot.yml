@@ -1,0 +1,54 @@
+name: FXP Bot — Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/fxp_bot/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Pre-Deploy Validation
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.FXP_TELEGRAM_TOKEN }}" ]; then
+            echo "❌ FXP_TELEGRAM_TOKEN not set"
+            exit 1
+          fi
+          echo "✅ Secrets validated"
+
+      - name: Check code quality
+        run: |
+          python -m py_compile projects/fxp_bot/bot.py
+          python -m py_compile projects/fxp_bot/fxp_monitor.py
+          echo "✅ Code quality check passed"
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    name: Deploy to Production
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create deployment summary
+        run: |
+          echo "📦 FXP Bot Deployment"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "✅ Ready for deployment"
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fxp-bot-deployment
+          path: projects/fxp_bot/
+          retention-days: 30
