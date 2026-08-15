@@ -1,17 +1,17 @@
 # FXP Askol Telegram Bot 🤖
 
-Automatically monitor the FXP website for new questions ("askol") and send instant notifications to a Telegram bot with direct links.
+ניטור אוטומטי של אתר FXP לשאלות חדשות ושליחת הודעות מיידיות לטלגרם עם קישורים ישירים.
 
-## ✨ Features
+## ✨ תכונות
 
-✅ Monitor FXP website every N minutes  
-✅ Detect new questions automatically  
-✅ Send formatted Telegram notifications  
-✅ Include clickable links to questions  
-✅ No duplicate notifications  
-✅ Comprehensive error handling  
-✅ SQLite persistence  
-✅ Detailed logging  
+✅ ניטור אתר FXP כל N דקות  
+✅ זיהוי שאלות חדשות אוטומטי  
+✅ שליחת הודעות Telegram מעוצבות  
+✅ קישורים ישירים לשאלות  
+✅ ללא הודעות דופליקט  
+✅ ניהול שגיאות מקיף  
+✅ התמדה בSQLite  
+✅ רישום יומנים מפורט  
 
 ## 🚀 Quick Start
 
@@ -201,13 +201,28 @@ Log format:
 ### "Duplicate notifications"
 **Solution:** Database might be corrupted - delete `fxp_askol.db` and restart
 
-## 📅 Development Roadmap
+## 📅 תוכנית פיתוח
 
-- [ ] Phase 1: Core scraping
-- [ ] Phase 2: Database & persistence
+- [x] Phase 1: Core scraping - ✅ סיום
+- [x] Phase 2: Database & persistence - ✅ סיום
 - [ ] Phase 3: Telegram integration
 - [ ] Phase 4: Scheduling & automation
 - [ ] Phase 5: Testing & deployment
+
+### Phase 2 - Indexes ואחסון נתונים
+
+**טבלאות:**
+- `processed_questions` - שאלות מעובדות עם indexes
+- `monitoring_log` - יומני הרצה של הניטור
+- `telegram_users` - משתמשים בטלגרם
+
+**Methods:**
+- `add_processed_question()` - הוסף שאלה
+- `is_question_processed()` - בדוק דופליקט
+- `log_monitoring_run()` - רשום הרצה
+- `get_recent_questions()` - קבל שאלות אחרונות
+- `get_statistics()` - סטטיסטיקות
+- `cleanup_old_data()` - נקה נתונים ישנים
 
 ## 🤝 Contributing
 
