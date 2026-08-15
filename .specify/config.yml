@@ -1,0 +1,82 @@
+# Specify Kit Configuration for FXP Bot Project
+
+project:
+  name: FXP Bot
+  description: Real-time Telegram bot monitoring FXP.co.il forums
+  version: 1.0.0
+  language: python
+  framework: cli
+
+# Specification-Driven Development
+specification:
+  enabled: true
+  file: SPEC.md
+  templates_dir: .specify/commands
+
+# Agent integrations
+agents:
+  claude:
+    enabled: true
+    context_file: CLAUDE.md
+    description: Claude Code IDE integration
+
+# Development commands
+commands:
+  - name: Plan
+    file: .specify/commands/plan.md
+    description: Create implementation plan from requirements
+
+  - name: Specify
+    file: .specify/commands/specify.md
+    description: Write or update SPEC.md with requirements
+
+  - name: Implement
+    file: .specify/commands/implement.md
+    description: Implement spec and create PR
+
+  - name: Test
+    file: .specify/commands/test.md
+    description: Run tests and validate implementation
+
+  - name: Deploy
+    file: .specify/commands/deploy.md
+    description: Deploy to production
+
+# CI/CD configuration
+cicd:
+  provider: github-actions
+  workflows:
+    test: .github/workflows/test-fxp-bot.yml
+    deploy: .github/workflows/deploy-fxp-bot.yml
+
+# Code quality standards
+standards:
+  python:
+    version: "3.9+"
+    linter: flake8
+    formatter: black
+    type_checker: mypy
+    test_framework: pytest
+
+  git:
+    branch_naming: feature/*, bugfix/*, hotfix/*
+    commit_format: conventional
+    pr_required: true
+    code_review_required: true
+
+# Documentation
+documentation:
+  readme: README.md
+  spec: SPEC.md
+  claude: CLAUDE.md
+  contributing: CONTRIBUTING.md
+  changelog: CHANGELOG.md
+
+# Deployment
+deployment:
+  target: standalone-cli
+  environment: production
+  secrets:
+    - TELEGRAM_TOKEN
+    - TELEGRAM_CHAT_ID
+  config_example: config-templates/fxp_bot.env.example

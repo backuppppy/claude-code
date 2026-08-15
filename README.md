@@ -188,6 +188,9 @@ python main.py
 
 ### 4. FXP Bot — `projects/fxp_bot/`
 בוט טלגרם לניטור FXP. קונפיג ב-`.env` (טוקן ב-Secrets, ראו `config-templates/fxp_bot.env.example`).
+- 📖 [`SPEC.md`](SPEC.md) — מפרט מלא של הפרויקט (דרישות, עיצוב, תכנית יישום)
+- 📖 [`CLAUDE.md`](CLAUDE.md) — context ל-Claude Code (ארכיטקטורה, קבצים עיקריים, בעיות נפוצות)
+- 🔧 שולב עם **spec-kit** לתיעוד, CI/CD workflows, ו-standards של GitHub
 
 ### 5. G0DM0D3 — `projects/G0DM0D3-changes/`
 fork של `elder-plinius/G0DM0D3`. שמרנו **רק את ה-diff שלנו** (שינויים ב-`api/routes/research.ts` ו-`api/server.ts`) ולא את כל הקוד של upstream.
