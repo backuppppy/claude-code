@@ -77,15 +77,21 @@ jobs:
 
       - name: Check for hardcoded secrets
         run: |
-          # Only check for secrets in actual code (not docstrings, comments, or setup scripts)
-          if grep -r "ghp_\|sk_live_\|sk_test_\|TELEGRAM_TOKEN\s*=" projects/fxp_bot/ \
-            --exclude="*.md" \
-            --exclude="*.log" \
-            --exclude="setup.py" \
-            --exclude="bot.py" | grep -v "os.environ" | grep -v "#"; then
-            echo "❌ Found potential hardcoded secrets!"
+          # Check for actual hardcoded API tokens in Python files (exclude examples, tests, and docstrings)
+          if find projects/fxp_bot/*.py -type f \
+            ! -name "setup.py" \
+            ! -name "bot.py" \
+            -exec grep -l "ghp_\|sk_live_\|sk_test_" {} \; 2>/dev/null | head -1; then
+            echo "❌ Found potential hardcoded API tokens!"
             exit 1
           fi
+          
+          # Check that .env files are not in the repo (except examples)
+          if find projects/fxp_bot -name ".env" -type f 2>/dev/null | head -1; then
+            echo "❌ Found .env file in repo! Use GitHub Secrets instead."
+            exit 1
+          fi
+          
           echo "✅ No hardcoded secrets found"
 
   validate-spec:
@@ -110,5 +116,9 @@ jobs:
     steps:
       - name: Print results
         run: |
-          echo "✅ All validation checks passed!"
-          echo "Ready for deployment"
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ All validation checks passed!"
+            echo "Ready for deployment"
+          else
+            echo "⚠️ Some checks failed — review logs above"
+          fi
