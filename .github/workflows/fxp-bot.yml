@@ -1,0 +1,64 @@
+name: FXP Bot - Continuous Monitoring
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Clone Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd projects/fxp-askol-telegram
+          pip install -r requirements.txt
+
+      - name: 🧪 Run Tests
+        run: |
+          cd projects/fxp-askol-telegram
+          python test_scraper_simple.py
+          python test_database_simple.py
+          python test_telegram_bot.py
+          python test_integration.py
+
+      - name: 🤖 Run FXP Bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ENABLE_NOTIFICATIONS: "True"
+        run: |
+          cd projects/fxp-askol-telegram
+          python -c "
+from main import FXPMonitor
+monitor = FXPMonitor()
+monitor.monitor_questions()
+"
+
+      - name: 📊 Commit Database
+        if: always()
+        run: |
+          cd projects/fxp-askol-telegram
+          git config --local user.email "bot@github.com"
+          git config --local user.name "FXP Bot"
+          if [ -f "fxp_askol.db" ]; then
+            git add fxp_askol.db
+            git diff-index --quiet HEAD || git commit -m "🤖 Update database"
+          fi
+
+      - name: 📤 Push Changes
+        if: always()
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
