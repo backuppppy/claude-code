@@ -1,0 +1,42 @@
+{
+  "phase": "phase-3",
+  "name": "Spec-Kit & Tools",
+  "tasks": [
+    {
+      "id": "task-3.1",
+      "title": "Import spec-kit scripts",
+      "description": "Add GitHub spec-kit bash and python utilities to repo",
+      "status": "completed",
+      "assigned_to": "claude",
+      "due_date": "2026-08-15",
+      "priority": "high"
+    },
+    {
+      "id": "task-3.2",
+      "title": "Setup feature scaffolding",
+      "description": "Configure create-new-feature scripts for project creation",
+      "status": "pending",
+      "assigned_to": "backuppppy",
+      "due_date": "2026-08-18",
+      "priority": "high"
+    },
+    {
+      "id": "task-3.3",
+      "title": "Configure prerequisites checking",
+      "description": "Setup environment validation using spec-kit tools",
+      "status": "pending",
+      "assigned_to": "claude",
+      "due_date": "2026-08-20",
+      "priority": "medium"
+    },
+    {
+      "id": "task-3.4",
+      "title": "Create task management system",
+      "description": "Setup tasks.json structure with specs-kit integration",
+      "status": "in-progress",
+      "assigned_to": "claude",
+      "due_date": "2026-08-15",
+      "priority": "high"
+    }
+  ]
+}

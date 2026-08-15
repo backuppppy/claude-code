@@ -1,0 +1,56 @@
+{
+  "id": "main-plan-2026",
+  "name": "Claude Code Main Development Plan",
+  "description": "Coordinating development across all projects and utilities",
+  "created_at": "2026-08-15T00:00:00Z",
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Setup & Infrastructure",
+      "description": "Initialize spec-kit, setup CI/CD, and project structure",
+      "status": "in-progress",
+      "tasks": [
+        "Initialize spec-kit configuration",
+        "Setup GitHub workflows",
+        "Configure memory system",
+        "Document project structure"
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "ZeroClaw Integration",
+      "description": "Full ZeroClaw setup with Claude API and YOLO mode",
+      "status": "completed",
+      "tasks": [
+        "Install ZeroClaw binary",
+        "Configure Claude API integration",
+        "Setup YOLO mode",
+        "Create helper scripts"
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Spec-Kit & Tools",
+      "description": "Add spec-kit utilities and development tools",
+      "status": "in-progress",
+      "tasks": [
+        "Import spec-kit scripts",
+        "Setup feature scaffolding",
+        "Configure prerequisites checking",
+        "Create task management system"
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Project Management",
+      "description": "Organize and document all projects",
+      "status": "pending",
+      "tasks": [
+        "Setup STIPS Monitor",
+        "Configure Storytel scripts",
+        "Organize project structure",
+        "Create dashboards"
+      ]
+    }
+  ]
+}
