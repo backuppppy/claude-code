@@ -47,7 +47,9 @@ def _discover_forums() -> dict[str, str]:
             if m:
                 fid = m.group(1)
                 name = a.get_text(strip=True).replace("הצג עוד", "").strip()
-                if name and len(name) > 1 and fid not in forums:
+                # Limit to first 30 chars - most forum names are shorter
+                name = name[:30].strip()
+                if name and len(name) > 2 and fid not in forums:
                     forums[fid] = name
         if forums:
             _forum_cache = forums

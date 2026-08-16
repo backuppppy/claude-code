@@ -118,18 +118,17 @@ def get_daily_report(registry: dict, target_date: str) -> str:
 
     # Build report
     date_str = target_date
-    lines = [f"📊 דוח אשכולות — {date_str}"]
-    lines.append("")
+    lines = [f"📊 דוח אשכולות — {date_str}\n"]
 
     total = sum(forum_counts.values())
+    sorted_forums = sorted(forum_counts.items(), key=lambda x: x[1], reverse=True)
 
-    # Show all forums but keep message size reasonable
-    for forum in sorted(forum_counts.keys()):
-        count = forum_counts[forum]
-        lines.append(f"📂 {forum}: {count}")
+    # Show forums sorted by thread count (most active first)
+    for i, (forum, count) in enumerate(sorted_forums, 1):
+        lines.append(f"{i:2d}. {forum}: {count}")
 
     lines.append("")
-    lines.append(f"סה״כ: {total} אשכולות")
+    lines.append(f"סה״כ: {total} אשכולות ב-{len(forum_counts)} פורומים")
 
     return "\n".join(lines)
 
@@ -164,20 +163,19 @@ def get_cumulative_report(registry: dict, up_to_date: str) -> str:
     if not forum_counts:
         return ""
 
-    # Build report
+    # Build report with forum links
     date_str = up_to_date
-    lines = [f"📊 דוח קומולטיבי עד — {date_str}"]
-    lines.append("")
+    lines = [f"📊 דוח קומולטיבי עד — {date_str}\n"]
 
     total = sum(forum_counts.values())
+    sorted_forums = sorted(forum_counts.items(), key=lambda x: x[1], reverse=True)
 
-    # Show all forums
-    for forum in sorted(forum_counts.keys()):
-        count = forum_counts[forum]
-        lines.append(f"📂 {forum}: {count}")
+    # Show forums sorted by thread count (most active first)
+    for i, (forum, count) in enumerate(sorted_forums, 1):
+        lines.append(f"{i:2d}. {forum}: {count}")
 
     lines.append("")
-    lines.append(f"סה״כ: {total} אשכולות (עד {date_str})")
+    lines.append(f"סה״כ: {total} אשכולות ב-{len(forum_counts)} פורומים (עד {date_str})")
 
     return "\n".join(lines)
 
