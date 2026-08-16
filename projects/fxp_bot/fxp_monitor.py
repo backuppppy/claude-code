@@ -30,6 +30,46 @@ _session.headers.update(HEADERS)
 _forum_cache: dict[str, str] = {}  # {forum_id: name}
 _forum_cache_ts: float = 0
 
+# Manual fixes for forum names that come out mangled from FXP HTML
+FORUM_NAME_FIXES: dict[str, str] = {
+    "21": "דיבורים ואקטואליה",
+    "1166": "אתאיזם",
+    "663": "אומנויות לחימה",
+    "127": "אנימה ומנגה",
+    "2769": "בריאות ותזונה",
+    "318": "ברצלונה",
+    "125": "הכרזות",
+    "1055": "הפועל באר שבע",
+    "297": "הצעות פורומים",
+    "342": "השכלה גבוהה",
+    "3731": "וואן פיס",
+    "10369": "חברי הכנסת מתראיינים",
+    "58": "כושר ופיתוח הגוף",
+    "8746": "כלכלה ועסקים",
+    "1305": "כרטיסי מסך",
+    "113": "כתוביות ותרגומים",
+    "6989": "ליגת האלופות",
+    "1590": "מדע וחלל",
+    "455": "מוזיקה",
+    "23": "מוטוריקה ורכב",
+    "1250": "מחשבים, אינטרנט ותוכנה",
+    "174": "מכבי חיפה",
+    "465": "מפרטי מחשב",
+    "18": "משוב ותמיכה",
+    "301": "סדרות אנימציה ונוסטלגיה",
+    "448": "סדרות כללי & שירותי סטרימינג",
+    "504": "ספרים וכתיבה",
+    "10550": "עיצוב גרפי ואומנות",
+    "8947": "פוקימון",
+    "9532": "פיזיקה",
+    "10095": "פילוסופיות ותאוריות",
+    "2282": "פיקאפ ופיתוח עצמי",
+    "30": "קולנוע וסרטים",
+    "506": "רשתות ואינטרנט",
+    "124": "תמונות הגולשים",
+    "10166": "צוות אירוחים מראיין",
+}
+
 
 def _discover_forums() -> dict[str, str]:
     global _forum_cache, _forum_cache_ts
@@ -80,6 +120,9 @@ def _discover_forums() -> dict[str, str]:
 
                 # Final check: should have Hebrew or Latin letters
                 if name and len(name) > 2 and fid not in forums:
+                    # Apply manual fixes for mangled names
+                    if fid in FORUM_NAME_FIXES:
+                        name = FORUM_NAME_FIXES[fid]
                     forums[fid] = name
         if forums:
             _forum_cache = forums
