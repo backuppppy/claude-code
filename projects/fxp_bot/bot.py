@@ -1,6 +1,16 @@
 """
 FXP Telegram Bot — monitors all FXP forums and sends new threads to Telegram.
 
+DAILY FLOW (2026-08-16 FINAL):
+1. **Startup** — sends report of TODAY's threads (00:00 to now)
+2. **Real-time** — notifies ONLY for threads opened TODAY (not old threads)
+3. **Midnight (00:00)** — sends report of YESTERDAY's threads only
+
+Key Rules:
+- TODAY = threads discovered from 00:00 to 23:59:59
+- Midnight report = threads from previous day (00:00 to 23:59:59)
+- Real-time notifications = only for TODAY's threads (older threads are skipped)
+
 Usage:
   TELEGRAM_TOKEN=xxx TELEGRAM_CHAT_ID=yyy python3 bot.py
   Or set in .env file and run: python3 bot.py
@@ -88,9 +98,12 @@ def save_registry(registry: dict):
 
 def get_daily_report(registry: dict, target_date: str) -> str:
     """
-    Generate a report for threads discovered ON target_date (YYYY-MM-DD).
-    Only shows threads from that specific day, groups by forum.
-    Used for: Daily reports (after midnight, until next midnight)
+    Generate report for threads discovered ONLY on target_date (YYYY-MM-DD).
+    Shows only threads from that specific day, grouped by forum.
+
+    Examples:
+    - get_daily_report(registry, "2026-08-16") → threads discovered on Aug 16 only
+    - get_daily_report(registry, "2026-08-15") → threads discovered on Aug 15 only
     """
     # Parse target date
     try:
@@ -98,86 +111,49 @@ def get_daily_report(registry: dict, target_date: str) -> str:
     except ValueError:
         return ""
 
-    # Count threads by forum for the target date only
-    forum_counts: dict[str, int] = {}
+    # Collect threads by forum + title for ONLY the target date
+    forums_threads: dict[str, list[tuple[str, str]]] = {}  # forum -> [(title, url)]
+
     for thread_id, data in registry.items():
         discovered_at = data.get("discovered_at", "")
         if not discovered_at:
             continue
         try:
-            # Parse ISO format: "2026-08-16T14:30:45Z"
-            discovery_date = datetime.fromisoformat(discovered_at.replace("Z", "+00:00")).date()
+            discovery_time = datetime.fromisoformat(discovered_at.replace("Z", "+00:00"))
+            discovery_date = discovery_time.date()
+
+            # Include ONLY if discovered on target date (exact match)
             if discovery_date == target:
                 forum = data.get("forum", "Unknown")
-                forum_counts[forum] = forum_counts.get(forum, 0) + 1
+                title = data.get("title", "Unknown")
+                url = data.get("url", "")
+
+                if forum not in forums_threads:
+                    forums_threads[forum] = []
+                forums_threads[forum].append((title, url))
         except Exception:
             continue
 
-    if not forum_counts:
+    if not forums_threads:
         return ""
 
-    # Build report
+    # Build report (sorted by forum count)
     date_str = target_date
     lines = [f"📊 דוח אשכולות — {date_str}\n"]
 
-    total = sum(forum_counts.values())
-    sorted_forums = sorted(forum_counts.items(), key=lambda x: x[1], reverse=True)
+    total = sum(len(threads) for threads in forums_threads.values())
+    sorted_forums = sorted(forums_threads.items(), key=lambda x: len(x[1]), reverse=True)
 
-    # Show forums sorted by thread count (most active first)
-    for i, (forum, count) in enumerate(sorted_forums, 1):
-        lines.append(f"{i:2d}. {forum}: {count}")
+    # Show all forums with thread counts
+    for forum, threads in sorted_forums:
+        lines.append(f"📂 <b>{forum}</b>: {len(threads)} אשכולות")
 
     lines.append("")
-    lines.append(f"סה״כ: {total} אשכולות ב-{len(forum_counts)} פורומים")
+    lines.append(f"סה״כ: {total} אשכולות ב-{len(forums_threads)} פורומים")
 
     return "\n".join(lines)
 
 
-def get_cumulative_report(registry: dict, up_to_date: str) -> str:
-    """
-    Generate cumulative report for threads discovered UP TO AND INCLUDING up_to_date.
-    Shows all threads from beginning through that date.
-    Used for: Midnight reports (at 00:00)
-    """
-    # Parse target date
-    try:
-        target = datetime.strptime(up_to_date, "%Y-%m-%d").date()
-    except ValueError:
-        return ""
-
-    # Count threads by forum UP TO AND INCLUDING target date
-    forum_counts: dict[str, int] = {}
-    for thread_id, data in registry.items():
-        discovered_at = data.get("discovered_at", "")
-        if not discovered_at:
-            continue
-        try:
-            # Parse ISO format: "2026-08-16T14:30:45Z"
-            discovery_date = datetime.fromisoformat(discovered_at.replace("Z", "+00:00")).date()
-            if discovery_date <= target:  # Include all dates up to target
-                forum = data.get("forum", "Unknown")
-                forum_counts[forum] = forum_counts.get(forum, 0) + 1
-        except Exception:
-            continue
-
-    if not forum_counts:
-        return ""
-
-    # Build report with forum links
-    date_str = up_to_date
-    lines = [f"📊 דוח קומולטיבי עד — {date_str}\n"]
-
-    total = sum(forum_counts.values())
-    sorted_forums = sorted(forum_counts.items(), key=lambda x: x[1], reverse=True)
-
-    # Show forums sorted by thread count (most active first)
-    for i, (forum, count) in enumerate(sorted_forums, 1):
-        lines.append(f"{i:2d}. {forum}: {count}")
-
-    lines.append("")
-    lines.append(f"סה״כ: {total} אשכולות ב-{len(forum_counts)} פורומים (עד {date_str})")
-
-    return "\n".join(lines)
 
 
 def format_startup_summary(registry: dict) -> str:
@@ -213,11 +189,16 @@ def send_telegram(token: str, chat_id: str, text: str):
 
 
 def format_post(post: dict) -> str:
+    """Format a single post/thread for Telegram display."""
     lines = []
-    if post.get("forum"):
-        lines.append(f"📂 {post['forum']}")
-    lines.append(f"📌 <b>{post['title']}</b>")
-    lines.append(post["url"])
+    forum = post.get("forum", "Unknown")
+    title = post.get("title", "Unknown")
+    url = post.get("url", "")
+
+    lines.append(f"📂 <b>{forum}</b>")
+    lines.append(f"📌 {title}")
+    if url:
+        lines.append(f"🔗 {url}")
     return "\n".join(lines)
 
 
@@ -266,6 +247,7 @@ def run():
                             registry[p["id"]] = {
                                 "forum": p.get("forum", "Unknown"),
                                 "title": p.get("title", ""),
+                                "url": p.get("url", ""),
                                 "discovered_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                             }
                 save_seen(seen)
@@ -276,37 +258,51 @@ def run():
                 else:
                     log.info(f"Flood guard: {len(new_posts)} new posts recorded silently.")
             else:
-                for post in reversed(new_posts):
-                    msg = format_post(post)
-                    send_telegram(token, chat_id, msg)
-                    seen.add(post["id"])
+                today = datetime.now().date()
 
-                    # Add to registry
+                for post in reversed(new_posts):
+                    # Add to registry first
                     if post["id"] not in registry:
                         registry[post["id"]] = {
                             "forum": post.get("forum", "Unknown"),
                             "title": post.get("title", ""),
+                            "url": post.get("url", ""),
                             "discovered_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                         }
 
-                    log.info(f"Sent: {post['title'][:60]}")
-                    time.sleep(1)
+                    # Only send notifications for TODAY's threads
+                    discovered_at = registry[post["id"]].get("discovered_at", "")
+                    try:
+                        discovery_time = datetime.fromisoformat(discovered_at.replace("Z", "+00:00"))
+                        discovery_date = discovery_time.date()
+
+                        if discovery_date == today:
+                            msg = format_post(post)
+                            send_telegram(token, chat_id, msg)
+                            log.info(f"Sent: {post['title'][:60]}")
+                            time.sleep(1)
+                        else:
+                            log.info(f"Skipped (not today): {post['title'][:60]}")
+                    except Exception as e:
+                        log.error(f"Date check error: {e}")
+
+                    seen.add(post["id"])
 
                 if new_posts:
                     save_seen(seen)
                     save_registry(registry)
 
-            # Check for midnight (00:00) and send cumulative report
+            # Check for midnight (00:00) and send daily report for YESTERDAY
             now = datetime.now()
             today_date = now.date()
 
             if last_midnight_report_date != today_date and now.hour == 0:
-                # At midnight: send cumulative report (all threads up to yesterday)
+                # At midnight: send report for YESTERDAY's threads only
                 yesterday = today_date - timedelta(days=1)
-                midnight_report = get_cumulative_report(registry, yesterday.isoformat())
+                midnight_report = get_daily_report(registry, yesterday.isoformat())
                 if midnight_report:
                     send_telegram(token, chat_id, midnight_report)
-                    log.info(f"Midnight cumulative report sent for {yesterday.isoformat()}")
+                    log.info(f"Midnight report sent for {yesterday.isoformat()}")
                 last_midnight_report_date = today_date
 
         except Exception as e:

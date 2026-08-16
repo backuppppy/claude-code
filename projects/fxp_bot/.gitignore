@@ -1,0 +1,13 @@
+# State files
+seen_posts.json
+thread_registry.json
+bot.log
+
+# Environment
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+.Python
