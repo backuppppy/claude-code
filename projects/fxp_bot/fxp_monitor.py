@@ -47,8 +47,18 @@ def _discover_forums() -> dict[str, str]:
             if m:
                 fid = m.group(1)
                 name = a.get_text(strip=True).replace("הצג עוד", "").strip()
-                # Limit to first 30 chars - most forum names are shorter
-                name = name[:30].strip()
+
+                # Clean up forum name: take only first meaningful part
+                # Remove extra text like thread titles that sometimes get mixed in
+                if " " in name:
+                    # Take only first word/phrase if it looks like a forum name
+                    parts = name.split("–")[0].split("- ")[0].split("  ")[0].strip()
+                    if parts:
+                        name = parts
+
+                # Limit to first 25 chars for clean forum names
+                name = name[:25].strip()
+
                 if name and len(name) > 2 and fid not in forums:
                     forums[fid] = name
         if forums:
