@@ -48,17 +48,37 @@ def _discover_forums() -> dict[str, str]:
                 fid = m.group(1)
                 name = a.get_text(strip=True).replace("הצג עוד", "").strip()
 
-                # Clean up forum name: take only first meaningful part
-                # Remove extra text like thread titles that sometimes get mixed in
-                if " " in name:
-                    # Take only first word/phrase if it looks like a forum name
-                    parts = name.split("–")[0].split("- ")[0].split("  ")[0].strip()
-                    if parts:
-                        name = parts
+                # Clean up: FXP HTML sometimes has forum names mixed with other text
+                # Take only the first meaningful part before separators
+                # Split on common separators and take first non-empty part
+                for sep in ["–", "—", " - ", "  ", "|", ":", "•"]:
+                    if sep in name:
+                        name = name.split(sep)[0].strip()
+                        break
 
-                # Limit to first 25 chars for clean forum names
-                name = name[:25].strip()
+                # Take only first Hebrew/Latin word or phrase (up to ~25 chars)
+                if len(name) > 30:
+                    # If still too long, try to find word boundary
+                    name = re.split(r"[\s]{2,}|[•|]", name)[0].strip()
 
+                name = name[:28].strip()
+
+                # If name contains mix of Hebrew and Latin AND too many chars, take just Hebrew part
+                # This catches cases like "אתאיזםמכה לאטאיסטים: אדונ" → "אתאיזם"
+                if len(name) > 20 and re.search(r"[א-ת].*[a-z0-9]|[a-z0-9].*[א-ת]", name, re.IGNORECASE):
+                    # Has mixed scripts - take only first script run
+                    m = re.match(r"^[֐-׿\s]+", name)  # Hebrew characters
+                    if m:
+                        name = m.group(0).strip()
+                    else:
+                        # Take everything up to first Hebrew char
+                        m = re.search(r"[א-ת]", name)
+                        if m:
+                            name = name[:m.start()].strip()
+
+                name = name.strip()
+
+                # Final check: should have Hebrew or Latin letters
                 if name and len(name) > 2 and fid not in forums:
                     forums[fid] = name
         if forums:
@@ -95,7 +115,31 @@ def _parse_threads(html: str, forum_name: str) -> list[dict]:
         tid = m.group(1)
         if tid in seen:
             continue
-        title = a.get_text(strip=True)
+
+        # Extract title from the link text
+        full_text = a.get_text(strip=True)
+        if len(full_text) < 4:
+            continue
+
+        # Try to remove forum name from beginning if it appears there
+        title = full_text
+        if title.startswith(forum_name):
+            title = title[len(forum_name):].strip()
+            # Remove leading dashes, spaces, RTL marks, etc.
+            title = re.sub(r"^[\s–\-–:•|‏]+", "", title).strip()
+
+        # Fallback: if the title removal didn't work well, try to extract
+        # by looking for common separators in Hebrew/English text
+        if not title or len(title) < 3:
+            # Try to split on Hebrew-English boundary or common separators
+            parts = re.split(r"(?=[א-ת])|(?=[A-Z])|[\-–•:|]", full_text)
+            # Take parts that aren't empty and aren't the forum name
+            valid_parts = [p.strip() for p in parts if p.strip() and p.strip() != forum_name and len(p.strip()) > 3]
+            if valid_parts:
+                title = valid_parts[0]
+            else:
+                title = full_text[:50]  # Fallback: first 50 chars
+
         if len(title) < 4:
             continue
 
@@ -105,7 +149,7 @@ def _parse_threads(html: str, forum_name: str) -> list[dict]:
             "id": tid,
             "title": title,
             "url": full_url,
-            "forum": forum_name,
+            "forum": forum_name,  # Use the clean forum_name from discovery
         })
 
     return results
