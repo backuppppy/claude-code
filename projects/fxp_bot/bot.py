@@ -144,12 +144,12 @@ def get_daily_report(registry: dict, target_date: str) -> str:
     total = sum(len(threads) for threads in forums_threads.values())
     sorted_forums = sorted(forums_threads.items(), key=lambda x: len(x[1]), reverse=True)
 
-    # Show all forums with thread counts
-    for forum, threads in sorted_forums:
-        lines.append(f"📂 <b>{forum}</b>: {len(threads)} אשכולות")
+    # Show all forums with thread counts and numbering
+    for idx, (forum, threads) in enumerate(sorted_forums, 1):
+        lines.append(f"{idx}. 📂 <b>{forum}</b>: {len(threads)} אשכולות חדשים")
 
     lines.append("")
-    lines.append(f"סה״כ: {total} אשכולות ב-{len(forums_threads)} פורומים")
+    lines.append(f"סה״כ: {total} אשכולות חדשים ב-{len(forums_threads)} פורומים")
 
     return "\n".join(lines)
 
