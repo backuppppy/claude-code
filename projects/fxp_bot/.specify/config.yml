@@ -1,0 +1,49 @@
+name: FXP Telegram Bot
+description: Real-time forum monitoring bot for FXP.co.il with spec-driven development
+
+metadata:
+  version: "1.0.0"
+  language: python
+  pythonVersion: "3.9+"
+  owner: fxp-bot-team
+  repository: "https://github.com/backuppppy/claude-code"
+
+development:
+  commands:
+    - /plan
+    - /specify
+    - /implement
+    - /test
+    - /deploy
+
+codeQuality:
+  linter: flake8
+  formatter: black
+  typeChecker: null
+  testRunner: pytest
+  requirements:
+    - python: ">=3.9"
+    - flake8: "latest"
+    - black: "latest"
+    - isort: "latest"
+
+cicd:
+  provider: github
+  workflows:
+    - test-fxp-bot.yml
+    - deploy-fxp-bot.yml
+  secrets:
+    - TELEGRAM_TOKEN
+    - TELEGRAM_CHAT_ID
+
+testing:
+  framework: pytest
+  coverage:
+    minimum: 70
+  integration: true
+
+documentation:
+  readme: README.md
+  spec: SPEC.md
+  contributing: CONTRIBUTING.md
+  claude: CLAUDE.md
