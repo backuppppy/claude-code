@@ -105,7 +105,7 @@ model_provider = "anthropic.default"
 
 [providers.models.anthropic.default]
 model = "claude-opus-5"
-api_key = "sk-ant-api03-..."
+api_key = "your_anthropic_api_key_here"
 timeout_secs = 300
 ```
 
@@ -142,7 +142,7 @@ quickstart_completed = true
 
 [providers.models.anthropic.default]
 model = "claude-opus-5"
-api_key = "sk-ant-api03-..."
+api_key = "your_anthropic_api_key_here"
 timeout_secs = 300
 ```
 
